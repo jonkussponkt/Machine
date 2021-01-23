@@ -1,0 +1,91 @@
+Temat <2> zrealizowałem w następujący sposób:
+
+ETAP 3:
+
+1) Stworzyłem szablon klasy Container, który stosuję do przechowywania liczby napojów.
+Zawiera on funkcję is_empty(), która sprawdza czy kontener jest pusty oraz operator [],
+którym możemy wydobyć wartość znajdującą się pod danym indeksem.
+2) Dodałem 4 typy wyjątków i zdefiniowałem je w pliku Exceptions.h. Wszystkie one dziedziczą
+publicznie po klasie std::exception i korzystają z dziedziczenia funkcji what(), która zwraca 
+odpowiednią wiadomość do wyprintowania. 
+3) Istnieją następujące wyjątki:
+-Zero-Drink - do stwierdzenia faktu, że nie ma danego napoju w automacie.
+-Wrong-Input - do stwierdzenia, że wprowadzono złe dane.
+-Greater-Value - do stwierdzenia, że podany nominał jest większy niż suma do zapłaty.
+-Improper-Range - zabezpieczenie przed zwrotem przez operator [] szablonu kontenera elementu
+pod nieistniejącą pozycją.
+4) W klasie User_Interaction wprowadziłem przeładowanie nazwy funkcji picking_something() 
+wywoływane w zależności od tego czy potrzebuję po prostu jakiegokolwiek inputu od użytkownika,
+czy jednej konkretnej liczby(jeden argument) czy liczb z jakiegoś przedziału przy podejmowaniu wyboru.
+
+ETAP 2:
+
+1) Istnieje możliwość uruchomienia programu z argumentem wiersza poleceń, którym jest ścieżka
+do pliku. Zatem w funkcji int main() najpierw sprawdzamy czy liczba argumentów (zmienna argc)
+jest równa dwa. Jeżeli tak jest, to otwieramy plik z argumentem argv[1], którym jest nasza
+nazwa pliku a następnie wskaźnikowi do plikowej zmiennej statycznej z klasy User_Interaction 
+(jej opis  znajduje się w punkcie nr ) przypisujemy adres zmiennej pomocniczej z funkcji main(), 
+którą wykorzystujemy tylko do otwarcia pliku. Następnie tworzymy obiekt klasy Automat i przechodzimy 
+do wykonania programu.
+
+2) Dodałem do programu 4 klasy służące do płacenia za towar:
+a) pay - klasa abstrakcyjna, która nam służy tylko do dziedziczenia z czysto wirtualną funkcją payment,
+którą posłużymy się przy polimorfizmie,
+b) Cash - do płatności gotówką, dziedziczy publicznie po klasie pay
+c) Card - do płatności kartą, dziedziczy publicznie po klasie pay
+d) BLIK - do płatności Blikiem, dziedziczy publicznie po klasie pay.
+
+3) Automat "uruchamia się" w momencie uruchomienia programu. Nie można nic kupić, 
+jeżeli w automacie nie ma dostępnych napojów (co sprawdza metoda is_empty().
+
+4) Obecnie proces płatności wygląda następująco:
+a) Klient może rozpocząć zakup lub wyjść.
+b) Następuje wybranie napoju oraz kolejne upewnienie. Program kieruje klienta do funkcji 
+składowej klasy Automat::print_an_offer(), która pokazuje możliwe do kupna napoje wraz 
+z wywołaniami funkcji add_to_print(), która odpowiada za właściwą odmianę liczby napojów 
+(item lub items), a następnie do funkcji transaction(), w której wywołujemy funkcję 
+choose_a_drink(),  gdzie użytkownik musi poprawnie wskazać napój, który chce kupić 
+- musi wskazać poprawneID napoju, a także nie może wskazać napoju, którego nie ma 
+w automacie (czyli, jeżeli number_of_drinks[ID] == 0).
+c) Wybieramy sposób płatności poslugując się wskaźnikiem polimorficznym, w zależności od wyboru
+za pomocą wskaźnika tworzymy dynamicznie obiekty klas dziedziczących po pay, czyli Cash, BLIK lub Card.
+d) Jeżeli wybraliśmy płatność gotówką, to w funkcji payment sprawdzamy, czy całość kwoty jest
+już uiszczona, dokonując porównania obiektu klasy Money to_pay z liczbą 0. Jeśli tak nie jest, to
+wchodzimy do funkcji toss_a_coin, w której wrzucamy monetę, rozpoznajemy nominał, sprawdzamy
+za pomocą operatora <= czy jest nie mniejszy od kwoty do zapłaty i odejmujemy monetę od to_pay.
+d) W przypadku płatności kartą użytkownik musi wprowadzić jakikolwiek znak z klawiatury aby "zbliżyć"
+kartę do terminala. W automatach w miażdżącej większości wprowadzona jest płatność zbliżeniowa,
+najbardziej dogodna dla klienta, tak więc nie musimy wprowadzać PINu.
+e) Płatność BLIKiem polega na wpisaniu wylosowanego 6-cyfrowego kodu w czasie 2 minut. Jeśli ktoś
+przekroczył ten czas, nie dochodzi do zakupu.
+f) Po kupnie napoju jego ilość w tablicy number_of_drinks zmniejszamy o jeden.
+g) Z powrotem użytkownik ma możliwość wyboru - opuszczenia programu lub dalszych zakupów.
+
+5) Dodałem także klasę User_Interaction, której wszystkie składowe i metody są publiczne i statyczne.
+Nie widziałem większego sensu w tworzeniu obiektów takiej klasy, natomiast chciałem dla wygody i 
+czytelności kodu zebrać w jednym miejscu pomocne zmienne i składowe, które wywołuję w kilku miejscach
+zamiast powtarzania tego samego kodu wiele razy.
+a) Wskaźnik typu ifstream '* file_input', za pomocą którego czytamy dane z otwartego pliku, domyślnie
+ustawiam go w pliku main.cpp na nullptr.
+b) Bool 'read_from_file' - czy czytamy z pliku, czy nie (jeżeli ma wartość true to mamy strumień
+wejścia z pliku, jeżeli false to mamy zwykły strumień 'cin' od użytkownika z klawiatury.
+Domyślnie jest ustawiony w pliku main.cpp na false i taka wartość zostaje, jeżeli program jest
+wywoływany 
+c) Processing() - do wypisania słówka 'Processing' po zakupie i w odstępie sekund wypisania kropek,
+po to by zasymulować działanie prawdziwych automatów.
+d) Picking_something() - dosłownie 'wybieranie czegoś' - funkcja wywołana za każdym razem, gdy 
+należy wprowadzić dane lub podjąć decyzję.
+e) Get_str() - do pozyskania stringa ze strumienia wejścia.
+
+
+KLASY Z ETAPU 1:
+-Automat, która składa się ze statycznej tablicy number_of_drinks reprezentującej dostępną
+w Automacie ilość danego napoju o indeksie odpowiadającym jego ID oraz z tablicy 4 obiektów 
+klasy napój : Pepsi, Coca-Cola, Mirinda oraz Piwniczanka, z funkcjami odpowiedzialnymi za 
+przeprowadzenie transakcji;
+-Drink - reprezentującą napoje, z polami ID, name (nazwą napoju), obiektu klasy
+Money price (ceną napoju w złotych i groszach) oraz z przeciążonym operatorem 
+strumienia wyjściowego <<,  służącym do dogodnego wypisywania obiektu tej klasy 
+na ekranie,
+-Money, która reprezentuje nam pieniądze i definiuje niektóre, potrzebne w tym 
+projekcie działania na nich w trakcie procesu płatności.

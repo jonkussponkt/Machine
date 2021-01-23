@@ -3,11 +3,12 @@
 //
 
 #include "Money.h"
+#include "Exceptions.h"
 
 using namespace std;
 
-Money Money::operator-=(Money &money) {
-    zlote -= money.zlote;
+Money Money::operator-=(Money &money) {  ///PRZECIĄŻONY OPERATOR -= DLA LEKKIEGO PRZEPROWADZENIA OPERACJI
+    zlote -= money.zlote;               ///ODJĘCIA KWOTY DO ZAPŁĄTY
     grosze -= money.grosze;
     if(grosze < 0){
         zlote--;
@@ -24,14 +25,20 @@ Money & Money::operator=(const Money & money) {
     return *this;
 }
 
-bool Money::operator!=(Money & money) const {
-    return zlote != money.zlote || grosze != money.grosze;
+bool Money::operator!=(int to_compare) const {
+    return zlote != to_compare || grosze != to_compare;
 }
 
 bool Money::operator<=(Money & money) const{
-    return zlote <= money.zlote || (zlote == money.zlote && grosze <= money.grosze);
+    if(zlote == money.zlote)
+        return grosze <= money.grosze;
+    else
+        return zlote <= money.zlote;
 }
 
 ostream & operator<<(ostream & os, Money & money){
-    return os << money.zlote << " zl, " << money.grosze << " gr";
+    os << money.zlote << " zl";
+    if(money.grosze > 0)
+        os << ", " << money.grosze << " gr";
+    return os;
 }

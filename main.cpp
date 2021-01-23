@@ -1,37 +1,30 @@
-#include <iostream>
+//
+// Created by Admin on 18.12.2020.
+//
+
 #include "Automat.h"
+#include "User_Interaction.h"
+#include <fstream>
 
-using namespace std;
+bool User_Interaction::read_from_file = false;
+std::ifstream * User_Interaction::file_input = nullptr;
 
-void hello(Automat & MACHINE){
-    int choice;
-    while(true) {
-        cout << "WELCOME IN OUR MACHINE!\n";
-        if(MACHINE.is_empty()) {
-            cout << "The machine is empty! Wait for next delivery :(\n";
-            break;
-        }
-        else {
-            cout << "Press 1 to buy something\nPress 2 to end the transaction\n";
-            cin >> choice;
-            if (choice == 1) {
-                MACHINE.print_an_offer(); ///NA POCZĄTEK POKAZUJEMY KLIENTOWI OFERTĘ NAPOJÓW
-                MACHINE.transaction(); ///PRZECHODZIMY DO TRANSAKCJI
-            }
-            else if (choice == 2){
-                cout << "Are you sure that you want to leave?\n";
-                break;
-            }
-            else {
-                cout << "Wrong choice! Pick the drink one more time\n";
-                continue;
-            }
-        }
+int main(int argc, char * argv[]){
+
+    if(argc == 2) {
+        ifstream read;
+        read.open(argv[1]);
+        if(!read.good())
+            std::cout << "An unexpected error occurred\n";
+        User_Interaction::file_input = &read;
+        User_Interaction::read_from_file = true;
+        Automat MACHINE;
+        MACHINE.hello();
+        read.close();
     }
-}
-
-int main() {
-    Automat MACHINE;
-    hello(MACHINE);
+    else{
+        Automat MACHINE;
+        MACHINE.hello();
+    }
     return 0;
 }

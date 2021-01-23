@@ -2,8 +2,8 @@
 // Created by Admin on 16.11.2020.
 //
 
-#ifndef PROJECT_OBJECT_1_DRINK_H
-#define PROJECT_OBJECT_1_DRINK_H
+#ifndef DRINK_H
+#define DRINK_H
 
 #include <string>
 #include <utility>
@@ -19,8 +19,7 @@ class Drink{
     friend class Automat;
 public:
     friend ostream & operator<<(ostream & stream, Drink & drink);
-    Drink(int a = 0, string b = " ", int zl = 0, int gr = 0) : ID(a), name(move(b)), price(zl, gr){};
-    Drink & operator=(const Drink & drink);
+    Drink(int number = 0, string title = "", int zl = 0, int gr = 0) : ID(number), name(move(title)), price(zl, gr){};
     ~Drink() = default;
 };
 
